@@ -1,15 +1,18 @@
 'use client'
 
-import { Heading } from '@radix-ui/themes'
 import * as Toolbar from '@radix-ui/react-toolbar'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons'
 import clsx from 'clsx'
+import { SerloEditorProps } from '@serlo/editor'
+
+const defaultUrl = 'https://www.youtube.com/watch?v=9bZkp7q19f0'
 
 export default function Home() {
   const [mode, setMode] = useState<'play' | 'edit'>('edit')
+  const [marker, setMarker] = useState<Marker[]>([])
 
   const toggleMode = () => {
     setMode((prevMode) => (prevMode === 'play' ? 'edit' : 'play'))
@@ -20,7 +23,15 @@ export default function Home() {
       <div className="mx-auto max-w-[800px] rounded-md outline-2 outline outline-gray-200">
         {renderToolbar()}
         <div className="p-2">
-          <Heading>{mode === 'play' ? 'Play' : 'Edit'}</Heading>
+          {mode === 'edit' ? (
+            <InteractiveVideoEditor
+              url={defaultUrl}
+              marker={marker}
+              setMarker={setMarker}
+            />
+          ) : (
+            <InteractiveVideoRenderer url={defaultUrl} marker={marker} />
+          )}
         </div>
       </div>
     </main>
@@ -57,4 +68,32 @@ export default function Home() {
       </Toolbar.Root>
     )
   }
+}
+
+function InteractiveVideoEditor({
+  url,
+  marker,
+  changeMarker,
+}: InteractiveVideoEditorProps) {
+  return 'editor'
+}
+
+function InteractiveVideoRenderer({ url, marker }: InteractiveVideoProps) {
+  return 'play'
+}
+
+interface InteractiveVideoEditorProps extends InteractiveVideoProps {
+  setMarker: React.Dispatch<React.SetStateAction<Marker[]>>
+}
+
+interface InteractiveVideoProps {
+  url: string
+  marker: Marker[]
+}
+
+interface Marker {
+  id: string
+  time: number
+  title: string
+  content: SerloEditorProps['initialState']
 }
