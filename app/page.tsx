@@ -8,7 +8,10 @@ import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons'
 import clsx from 'clsx'
 import { SerloEditorProps } from '@serlo/editor'
 
-const defaultUrl = 'https://www.youtube.com/watch?v=9bZkp7q19f0'
+// A CC-BY 3.0 video from Blender Foundation
+// See https://mango.blender.org/
+const defaultUrl =
+  'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'
 
 export default function Home() {
   const [mode, setMode] = useState<'play' | 'edit'>('edit')
