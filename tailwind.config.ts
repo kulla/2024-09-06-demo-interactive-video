@@ -1,3 +1,5 @@
+import colors from 'tailwindcss/colors'
+
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -8,7 +10,7 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: { orange: 'rgb(255, 241, 219)', grey: 'rgb(229, 229, 229)' },
+      colors: { organge: colors.orange, gray: colors.gray },
     },
   },
   plugins: [],
