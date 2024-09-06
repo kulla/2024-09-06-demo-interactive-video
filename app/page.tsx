@@ -1,19 +1,20 @@
 'use client'
 
 import * as Toolbar from '@radix-ui/react-toolbar'
-import React, { useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
+import { faEllipsis, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons'
 import clsx from 'clsx'
 import { SerloEditorProps } from '@serlo/editor'
+import VideoPlayerWithMarkers from 'react-video-markers'
 
 // A CC-BY 3.0 video from Blender Foundation
 // See https://mango.blender.org/
 const defaultUrl =
   'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'
 
-export default function Home() {
+export default function InteractiveVideoPlugin() {
   const [mode, setMode] = useState<'play' | 'edit'>('edit')
   const [marker, setMarker] = useState<Marker[]>([])
 
@@ -78,11 +79,52 @@ function InteractiveVideoEditor({
   marker,
   changeMarker,
 }: InteractiveVideoEditorProps) {
-  return 'editor'
+  const currentTime = useRef(0)
+
+  const onProgress = useCallback((event: Event) => {
+    if (event.type === 'timeupdate') {
+      currentTime.current = (event.target as HTMLVideoElement).currentTime
+    }
+  }, [])
+
+  return (
+    <>
+      <VideoPlayer url={url} marker={marker} onProgress={onProgress} />
+      <button
+        className="mx-auto mt-4 rounded p-2 bg-orange-100 block border-1 border-gray-500"
+        onClick={() => console.log(currentTime.current)}
+      >
+        <FontAwesomeIcon icon={faPlus} /> Aufgabe an aktueller Stelle hinzufügen
+      </button>
+    </>
+  )
 }
 
 function InteractiveVideoRenderer({ url, marker }: InteractiveVideoProps) {
   return 'play'
+}
+
+function VideoPlayer({ url, marker, onProgress }: VideoPlayerProps) {
+  const [volume, setVolume] = useState(1)
+  const [isPlaying, setIsPlaying] = useState(false)
+
+  return (
+    <div className="mx-auto w-[640px]">
+      <VideoPlayerWithMarkers
+        url={url}
+        volume={volume}
+        isPlaying={isPlaying}
+        onVolume={setVolume}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onProgress={onProgress}
+      />
+    </div>
+  )
+}
+
+interface VideoPlayerProps extends InteractiveVideoProps {
+  onProgress: (event: Event) => void
 }
 
 interface InteractiveVideoEditorProps extends InteractiveVideoProps {
@@ -95,7 +137,6 @@ interface InteractiveVideoProps {
 }
 
 interface Marker {
-  id: string
   time: number
   title: string
   content: SerloEditorProps['initialState']
