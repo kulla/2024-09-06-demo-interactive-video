@@ -115,11 +115,13 @@ function InteractiveVideoEditor({
       <CreateExerciseDialog
         isOpen={openModal}
         setIsOpen={setOpenModal}
-        onSave={(exercise) => {
+        onSave={({ title, content }) => {
           const newMarker = {
             type: ExerciseType.MultipleChoice,
             time: currentTime.current,
-            ...exercise,
+            // TODO: Add a better default title
+            title: title.trim() !== '' ? title : 'Aufgabe',
+            content,
           }
 
           setMarkers((prev) => R.sortBy((x) => x.time, [...prev, newMarker]))
@@ -135,6 +137,15 @@ function InteractiveVideoEditor({
       >
         <FontAwesomeIcon icon={faPlus} /> Aufgabe an aktueller Stelle hinzufügen
       </button>
+      <div className="mt-4">
+        {markers.map((marker, index) => (
+          <div key={index} className="flex items-center space-x-2">
+            <span>{formatTime(marker.time)}</span>
+            <span>{marker.type}</span>
+            <span>{marker.title}</span>
+          </div>
+        ))}
+      </div>
     </>
   )
 }
@@ -350,3 +361,17 @@ interface Exercise {
 }
 
 type Content = { plugin: string; state: unknown }
+
+function formatTime(seconds: number): string {
+  const hours = Math.floor(seconds / 3600)
+    .toString()
+    .padStart(2, '0')
+  const minutes = Math.floor((seconds % 3600) / 60)
+    .toString()
+    .padStart(2, '0')
+  const secs = Math.round(seconds % 60)
+    .toString()
+    .padStart(2, '0')
+
+  return `${hours}:${minutes}:${secs}`
+}
