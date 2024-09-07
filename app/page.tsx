@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import * as Toolbar from '@radix-ui/react-toolbar'
 import React, { useCallback, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsis, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faEllipsis, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons'
 import { SerloEditor } from '@serlo/editor'
 import VideoPlayerWithMarkers from 'react-video-player-extended'
@@ -137,12 +137,24 @@ function InteractiveVideoEditor({
       >
         <FontAwesomeIcon icon={faPlus} /> Aufgabe an aktueller Stelle hinzufügen
       </button>
-      <div className="mt-4">
+      <div className="mt-4 mx-4">
         {markers.map((marker, index) => (
-          <div key={index} className="flex items-center space-x-2">
-            <span>{formatTime(marker.time)}</span>
-            <span>{marker.type}</span>
-            <span>{marker.title}</span>
+          <div key={index} className="flex items-center justify-between">
+            <div className="flex space-x-4">
+              <span>{formatTime(marker.time)}</span>
+              <span>{marker.type}</span>
+              <span>{marker.title}</span>
+            </div>
+            <div className="flex space-x-4">
+              <button
+                className="button self-end"
+                onClick={() => {
+                  setMarkers((prev) => prev.filter((x) => x !== marker))
+                }}
+              >
+                <FontAwesomeIcon icon={faTrash} /> Löschen
+              </button>
+            </div>
           </div>
         ))}
       </div>
