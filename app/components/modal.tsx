@@ -6,7 +6,7 @@ import { cn } from '../helper/cn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export interface ModalWithCloseButtonProps {
-  title: string
+  title: string | ReactNode
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   children: ReactNode

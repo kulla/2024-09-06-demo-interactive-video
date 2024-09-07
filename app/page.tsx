@@ -183,7 +183,6 @@ function VideoPlayer({
 
 interface CreateExerciseDialogProps {
   isOpen: boolean
-  time: number
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   onCreate: (exercise: Exercise) => void
 }
@@ -191,18 +190,26 @@ interface CreateExerciseDialogProps {
 function CreateExerciseDialog({
   setIsOpen,
   onCreate,
-  time,
   isOpen,
 }: CreateExerciseDialogProps) {
   const [content, setContent] = useState<Content | null>(null)
+  const [title, setTitle] = useState('')
 
   return (
     <ModalWithCloseButton
       isOpen={isOpen}
       title={
-        content
-          ? 'Aufgabe für aktuelle Stelle erstellen'
-          : 'Aufgabentyp für aktuelle Stelle auswählen'
+        content === null ? (
+          'Aufgabentyp auswählen'
+        ) : (
+          <input
+            className="border-none focus:outline-none"
+            type="text"
+            value={title}
+            placeholder="Titel"
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        )
       }
       setIsOpen={setIsOpen}
     >
@@ -231,16 +238,8 @@ function CreateExerciseDialog({
   }
 
   function ExerciseEditor({ content }: { content: Content }) {
-    const [title, setTitle] = useState(`Aufgabe at ${time}s`)
     return (
       <>
-        <input
-          className="w-full border-none focus:outline-none font-bold text-lg"
-          type="text"
-          value={title}
-          placeholder="Titel"
-          onChange={(e) => setTitle(e.target.value)}
-        />
         <SerloEditor
           initialState={content}
           editorVariant="unknown"
