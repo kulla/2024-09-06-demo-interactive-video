@@ -100,6 +100,7 @@ function InteractiveVideoEditor({
 }: InteractiveVideoEditorProps) {
   const [openModal, setOpenModal] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [wasPlayingBeforeModal, setWasPlayingBeforeModal] = useState(false)
   const [editIndex, setEditIndex] = useState<null | number>(null)
   const currentTime = useRef(0)
 
@@ -132,6 +133,7 @@ function InteractiveVideoEditor({
 
           setMarkers((prev) => R.sortBy((x) => x.time, [...prev, newMarker]))
           setOpenModal(false)
+          setIsPlaying(wasPlayingBeforeModal)
         }}
       />
       {editIndex !== null ? (
@@ -161,6 +163,7 @@ function InteractiveVideoEditor({
         className="button mx-auto mt-4 block"
         onClick={() => {
           setOpenModal(true)
+          setWasPlayingBeforeModal(isPlaying)
           setIsPlaying(false)
         }}
       >
