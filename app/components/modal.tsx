@@ -39,9 +39,9 @@ export function ModalWithCloseButton({
           <Dialog.Overlay className="fixed inset-0 bg-white bg-opacity-75" />
           <Dialog.Content
             className={cn(
-              'fixed top-1/2 left-1/2',
+              'fixed top-1/2 left-1/2 max-w-[640px] max-h-[80vh]',
               'transform -translate-x-1/2 -translate-y-1/2 w-full',
-              'max-w-[640px] bg-white rounded-xl shadow-lg p-6 z-20',
+              'bg-white rounded-xl shadow-lg p-6 flex flex-col',
             )}
             onEscapeKeyDown={() => setIsOpen(false)}
           >
@@ -54,7 +54,9 @@ export function ModalWithCloseButton({
               {title}
             </Dialog.Title>
 
-            {children}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden">
+              {children}
+            </div>
 
             <Dialog.Close
               aria-label="Close"
