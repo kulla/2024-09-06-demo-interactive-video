@@ -4,7 +4,12 @@ import * as R from 'ramda'
 import * as Toolbar from '@radix-ui/react-toolbar'
 import React, { useCallback, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsis, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import {
+  faEdit,
+  faEllipsis,
+  faPlus,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons'
 import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons'
 import { SerloEditor } from '@serlo/editor'
 import VideoPlayerWithMarkers from 'react-video-player-extended'
@@ -95,6 +100,7 @@ function InteractiveVideoEditor({
 }: InteractiveVideoEditorProps) {
   const [openModal, setOpenModal] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [editIndex, setEditIndex] = useState<null | number>(null)
   const currentTime = useRef(0)
 
   const onProgress = useCallback((event: Event) => {
@@ -124,10 +130,35 @@ function InteractiveVideoEditor({
             content,
           }
 
+          console.log(newMarker)
+
           setMarkers((prev) => R.sortBy((x) => x.time, [...prev, newMarker]))
           setOpenModal(false)
         }}
       />
+      {editIndex !== null ? (
+        <CreateExerciseDialog
+          isOpen={editIndex !== null}
+          setIsOpen={(value) => {
+            if (!value) setEditIndex(null)
+          }}
+          initialContent={markers[editIndex].content}
+          initialTitle={markers[editIndex].title}
+          onSave={({ title, content }) => {
+            setMarkers((prev) => [
+              ...prev.slice(0, editIndex),
+              {
+                ...prev[editIndex],
+                content,
+                title: title.trim() !== '' ? title : 'Aufgabe',
+              },
+              ...prev.slice(editIndex + 1),
+            ])
+
+            setEditIndex(null)
+          }}
+        />
+      ) : null}
       <button
         className="button mx-auto mt-4 block"
         onClick={() => {
@@ -146,8 +177,11 @@ function InteractiveVideoEditor({
               <span>{marker.title}</span>
             </div>
             <div className="flex space-x-4">
+              <button className="button" onClick={() => setEditIndex(index)}>
+                <FontAwesomeIcon icon={faEdit} /> Bearbeiten
+              </button>
               <button
-                className="button self-end"
+                className="button"
                 onClick={() => {
                   setMarkers((prev) => prev.filter((x) => x !== marker))
                 }}
@@ -208,15 +242,19 @@ interface CreateExerciseDialogProps {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   onSave: (exercise: Exercise) => void
+  initialContent?: Content | null
+  initialTitle?: string
 }
 
 function CreateExerciseDialog({
   setIsOpen,
   onSave,
   isOpen,
+  initialContent = null,
+  initialTitle = '',
 }: CreateExerciseDialogProps) {
-  const [content, setContent] = useState<Content | null>(null)
-  const [title, setTitle] = useState('')
+  const [content, setContent] = useState<Content | null>(initialContent)
+  const [title, setTitle] = useState(initialTitle)
 
   return (
     <ModalWithCloseButton
@@ -239,7 +277,21 @@ function CreateExerciseDialog({
       {content === null ? (
         <ExerciseTypeSelection />
       ) : (
-        <ExerciseEditor content={content} />
+        <SerloEditor
+          initialState={content}
+          editorVariant="unknown"
+          onChange={({ changed, getDocument }) => {
+            if (changed) {
+              const newContent = getDocument()
+
+              if (newContent !== null) setContent(newContent)
+            }
+          }}
+        >
+          {(editor) => {
+            return <>{editor.element}</>
+          }}
+        </SerloEditor>
       )}
       <SaveAndCloseToolbar />
     </ModalWithCloseButton>
@@ -258,30 +310,6 @@ function CreateExerciseDialog({
           </button>
         ))}
       </div>
-    )
-  }
-
-  function ExerciseEditor({ content }: { content: Content }) {
-    return (
-      <>
-        <SerloEditor
-          initialState={content}
-          editorVariant="unknown"
-          onChange={({ changed, getDocument }) => {
-            if (changed) {
-              const newState = getDocument()
-
-              if (newState !== null) {
-                setContent(newState)
-              }
-            }
-          }}
-        >
-          {(editor) => {
-            return <>{editor.element}</>
-          }}
-        </SerloEditor>
-      </>
     )
   }
 
