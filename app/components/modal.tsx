@@ -63,7 +63,7 @@ export function ModalWithCloseButton({
               className={cn(
                 'absolute right-3.5 top-3.5 inline-flex h-6 w-6',
                 'cursor-pointer items-center justify-center rounded-full',
-                'border-none leading-tight text-almost-black hover:bg-orange-100',
+                'border-none leading-tight text-almost-black hover:bg-orange-200',
                 'hover:text-white',
               )}
               data-qa="modal-close-button"
