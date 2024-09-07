@@ -130,8 +130,6 @@ function InteractiveVideoEditor({
             content,
           }
 
-          console.log(newMarker)
-
           setMarkers((prev) => R.sortBy((x) => x.time, [...prev, newMarker]))
           setOpenModal(false)
         }}
