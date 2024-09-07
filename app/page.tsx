@@ -1,5 +1,6 @@
 'use client'
 
+import ReactModal from 'react-modal'
 import * as Toolbar from '@radix-ui/react-toolbar'
 import React, { useCallback, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -7,7 +8,7 @@ import { faEllipsis, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons'
 import clsx from 'clsx'
 import { SerloEditorProps } from '@serlo/editor'
-import VideoPlayerWithMarkers from 'react-video-markers'
+import VideoPlayerWithMarkers from 'react-video-player-extended'
 
 // A CC-BY 3.0 video from Blender Foundation
 // See https://mango.blender.org/
@@ -77,8 +78,9 @@ export default function InteractiveVideoPlugin() {
 function InteractiveVideoEditor({
   url,
   marker,
-  changeMarker,
+  setMarker,
 }: InteractiveVideoEditorProps) {
+  const [openModal, setOpenModal] = useState(false)
   const currentTime = useRef(0)
 
   const onProgress = useCallback((event: Event) => {
@@ -90,9 +92,17 @@ function InteractiveVideoEditor({
   return (
     <>
       <VideoPlayer url={url} marker={marker} onProgress={onProgress} />
+      <CreateMarkerDialog
+        isOpen={openModal}
+        onClose={() => setOpenModal(false)}
+        onCreate={(marker) => {
+          setMarker((prevMarker) => [...prevMarker, marker])
+          setOpenModal(false)
+        }}
+      />
       <button
         className="mx-auto mt-4 rounded p-2 bg-orange-100 block border-1 border-gray-500"
-        onClick={() => console.log(currentTime.current)}
+        onClick={() => setOpenModal(true)}
       >
         <FontAwesomeIcon icon={faPlus} /> Aufgabe an aktueller Stelle hinzufügen
       </button>
@@ -120,6 +130,44 @@ function VideoPlayer({ url, marker, onProgress }: VideoPlayerProps) {
         onProgress={onProgress}
       />
     </div>
+  )
+}
+
+interface CreateMarkerDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  onCreate: (marker: Marker) => void
+}
+
+function CreateMarkerDialog({
+  onClose,
+  onCreate,
+  isOpen,
+}: CreateMarkerDialogProps) {
+  return (
+    <Dialog
+      isOpen={isOpen}
+      title="Erstelle Aufgabe an aktueller Stelle"
+      onClose={onClose}
+    >
+      Create Marker
+    </Dialog>
+  )
+}
+
+interface DialogProps {
+  children: ReactModal.Props['children']
+  isOpen: boolean
+  onClose: () => void
+  title: string
+}
+
+function Dialog({ children, isOpen, onClose, title }: DialogProps) {
+  return (
+    <ReactModal isOpen={isOpen} onRequestClose={onClose}>
+      <h2>{title}</h2>
+      {children}
+    </ReactModal>
   )
 }
 
