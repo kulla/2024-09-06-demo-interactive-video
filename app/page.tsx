@@ -170,7 +170,7 @@ function InteractiveVideoEditor({
       </button>
       <div className="mt-4 mx-4">
         {markers.map((marker, index) => (
-          <div key={index} className="flex items-center justify-between">
+          <div key={index} className="flex items-center justify-between mt-2">
             <div className="flex space-x-4">
               <span>{formatTime(marker.time)}</span>
               <span>{marker.type}</span>
