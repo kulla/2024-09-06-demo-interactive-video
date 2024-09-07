@@ -75,9 +75,9 @@ export default function InteractiveVideoPlugin() {
         >
           Vorschau{' '}
           {mode === 'play' ? (
-            <FontAwesomeIcon icon={faCircle} />
-          ) : (
             <FontAwesomeIcon icon={faCheckCircle} />
+          ) : (
+            <FontAwesomeIcon icon={faCircle} />
           )}
         </Toolbar.Button>
         <Toolbar.Separator className="h-6 w-[2px] bg-gray-400" />
