@@ -5,7 +5,7 @@ import React, { useCallback, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsis, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons'
-import { SerloEditor, SerloEditorProps } from '@serlo/editor'
+import { SerloEditor } from '@serlo/editor'
 import VideoPlayerWithMarkers from 'react-video-player-extended'
 import { cn } from './helper/cn'
 import { ModalWithCloseButton } from './components/modal'
@@ -114,6 +114,7 @@ function InteractiveVideoEditor({
       <CreateExerciseDialog
         isOpen={openModal}
         setIsOpen={setOpenModal}
+        time={currentTime.current}
         onCreate={(exercise) => {
           const newMarker = {
             type: ExerciseType.MultipleChoice,
@@ -182,6 +183,7 @@ function VideoPlayer({
 
 interface CreateExerciseDialogProps {
   isOpen: boolean
+  time: number
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   onCreate: (exercise: Exercise) => void
 }
@@ -189,9 +191,9 @@ interface CreateExerciseDialogProps {
 function CreateExerciseDialog({
   setIsOpen,
   onCreate,
+  time,
   isOpen,
 }: CreateExerciseDialogProps) {
-  const [title, setTitle] = useState('Aufgabe')
   const [content, setContent] = useState<Content | null>(null)
 
   return (
@@ -229,10 +231,11 @@ function CreateExerciseDialog({
   }
 
   function ExerciseEditor({ content }: { content: Content }) {
+    const [title, setTitle] = useState(`Aufgabe at ${time}s`)
     return (
       <>
         <input
-          className="w-full p-2 rounded-md border border-gray-500 mb-2"
+          className="w-full border-none focus:outline-none font-bold text-lg"
           type="text"
           value={title}
           placeholder="Titel"
