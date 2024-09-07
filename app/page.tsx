@@ -125,8 +125,7 @@ function InteractiveVideoEditor({
           const newMarker = {
             type: ExerciseType.MultipleChoice,
             time: currentTime.current,
-            // TODO: Add a better default title
-            title: title.trim() !== '' ? title : 'Aufgabe',
+            title: getDefaultTitle(title, currentTime.current),
             content,
           }
 
@@ -150,7 +149,7 @@ function InteractiveVideoEditor({
               {
                 ...prev[editIndex],
                 content,
-                title: title.trim() !== '' ? title : 'Aufgabe',
+                title: getDefaultTitle(title, currentTime.current),
               },
               ...prev.slice(editIndex + 1),
             ])
@@ -401,6 +400,12 @@ interface Exercise {
 }
 
 type Content = { plugin: string; state: unknown }
+
+function getDefaultTitle(title: string, time: number): string {
+  return title.trim() !== ''
+    ? title
+    : `Aufgabe an der Stelle ${formatTime(time)}`
+}
 
 function formatTime(seconds: number): string {
   const hours = Math.floor(seconds / 3600)
