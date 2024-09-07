@@ -114,8 +114,7 @@ function InteractiveVideoEditor({
       <CreateExerciseDialog
         isOpen={openModal}
         setIsOpen={setOpenModal}
-        time={currentTime.current}
-        onCreate={(exercise) => {
+        onSave={(exercise) => {
           const newMarker = {
             type: ExerciseType.MultipleChoice,
             time: currentTime.current,
@@ -127,7 +126,7 @@ function InteractiveVideoEditor({
         }}
       />
       <button
-        className="mx-auto mt-4 rounded p-2 bg-orange-100 block border-1 border-gray-500"
+        className="button mx-auto mt-4 block"
         onClick={() => {
           setOpenModal(true)
           setIsPlaying(false)
@@ -184,12 +183,12 @@ function VideoPlayer({
 interface CreateExerciseDialogProps {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  onCreate: (exercise: Exercise) => void
+  onSave: (exercise: Exercise) => void
 }
 
 function CreateExerciseDialog({
   setIsOpen,
-  onCreate,
+  onSave,
   isOpen,
 }: CreateExerciseDialogProps) {
   const [content, setContent] = useState<Content | null>(null)
@@ -228,7 +227,7 @@ function CreateExerciseDialog({
         {Object.values(ExerciseType).map((type) => (
           <button
             key={type}
-            className="rounded-md p-2 bg-orange-100"
+            className="button"
             onClick={() => setContent(getInitialContent(type))}
           >
             {type}
@@ -265,10 +264,18 @@ function CreateExerciseDialog({
   function SaveAndCloseToolbar() {
     return (
       <Toolbar.Root className="flex justify-end mt-6">
-        <Toolbar.Button
-          className="rounded-md p-2 bg-orange-100"
-          onClick={() => setIsOpen(false)}
-        >
+        {content !== null ? (
+          <Toolbar.Button
+            className="button mr-4"
+            onClick={() => {
+              onSave({ title, content })
+              setIsOpen(false)
+            }}
+          >
+            Speichern
+          </Toolbar.Button>
+        ) : null}
+        <Toolbar.Button className="button" onClick={() => setIsOpen(false)}>
           Abbrechen
         </Toolbar.Button>
       </Toolbar.Root>
