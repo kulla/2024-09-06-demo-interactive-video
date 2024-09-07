@@ -1,19 +1,27 @@
 'use client'
 
-import ReactModal from 'react-modal'
 import * as Toolbar from '@radix-ui/react-toolbar'
 import React, { useCallback, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsis, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons'
-import clsx from 'clsx'
 import { SerloEditorProps } from '@serlo/editor'
 import VideoPlayerWithMarkers from 'react-video-player-extended'
+import { cn } from './helper/cn'
+import { ModalWithCloseButton } from './components/modal'
 
 // A CC-BY 3.0 video from Blender Foundation
 // See https://mango.blender.org/
 const defaultUrl =
   'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'
+
+enum ExerciseType {
+  MultipleChoice = 'MultipleChoice',
+  SingleChoice = 'SingleChoice',
+  Input = 'Input',
+  FillInTheBlanks = 'FillInTheBlanks',
+  DragAndDrop = 'DragAndDrop',
+}
 
 export default function InteractiveVideoPlugin() {
   const [mode, setMode] = useState<'play' | 'edit'>('edit')
@@ -45,7 +53,7 @@ export default function InteractiveVideoPlugin() {
   function renderToolbar() {
     return (
       <Toolbar.Root
-        className={clsx(
+        className={cn(
           'relative top-[-2px] left-[-2px] rounded-t-md w-[calc(100%+4px)]',
           ' bg-orange-100 flex justify-end  align-center p-1',
         )}
@@ -53,7 +61,7 @@ export default function InteractiveVideoPlugin() {
         <div className="mx-2 font-bold text-sm">Interaktives Video</div>
         <Toolbar.Separator className="h-6 w-[2px] bg-gray-400" />
         <Toolbar.Button
-          className={clsx(
+          className={cn(
             'mx-2 rounded-md border border-gray-500 text-sm transition-all',
             'px-1 hover:bg-orange-200 focus-visible:bg-orange-200',
           )}
@@ -94,7 +102,7 @@ function InteractiveVideoEditor({
       <VideoPlayer url={url} marker={marker} onProgress={onProgress} />
       <CreateMarkerDialog
         isOpen={openModal}
-        onClose={() => setOpenModal(false)}
+        setIsOpen={setOpenModal}
         onCreate={(marker) => {
           setMarker((prevMarker) => [...prevMarker, marker])
           setOpenModal(false)
@@ -135,40 +143,70 @@ function VideoPlayer({ url, marker, onProgress }: VideoPlayerProps) {
 
 interface CreateMarkerDialogProps {
   isOpen: boolean
-  onClose: () => void
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   onCreate: (marker: Marker) => void
 }
 
 function CreateMarkerDialog({
-  onClose,
+  setIsOpen,
   onCreate,
   isOpen,
 }: CreateMarkerDialogProps) {
+  const [exerciseType, setExerciseType] = useState<ExerciseType | null>(null)
+
   return (
-    <Dialog
+    <ModalWithCloseButton
       isOpen={isOpen}
-      title="Erstelle Aufgabe an aktueller Stelle"
-      onClose={onClose}
+      title={
+        exerciseType
+          ? 'Aufgabe für aktuelle Stelle erstellen'
+          : 'Aufgabentyp für aktuelle Stelle auswählen'
+      }
+      setIsOpen={setIsOpen}
     >
-      Create Marker
-    </Dialog>
+      <ExerciseTypeSelection />
+    </ModalWithCloseButton>
   )
-}
 
-interface DialogProps {
-  children: ReactModal.Props['children']
-  isOpen: boolean
-  onClose: () => void
-  title: string
-}
+  function ExerciseTypeSelection() {
+    if (exerciseType !== null) return
 
-function Dialog({ children, isOpen, onClose, title }: DialogProps) {
-  return (
-    <ReactModal isOpen={isOpen} onRequestClose={onClose}>
-      <h2>{title}</h2>
-      {children}
-    </ReactModal>
-  )
+    // TODO: Icon hinzufügen
+    return (
+      <div className="flex flex-col space-y-2">
+        <button
+          className="rounded-md p-2 bg-orange-100"
+          onClick={() => setExerciseType(ExerciseType.MultipleChoice)}
+        >
+          Multiple Choice
+        </button>
+        <button
+          className="rounded-md p-2 bg-orange-100"
+          onClick={() => setExerciseType(ExerciseType.SingleChoice)}
+        >
+          Single Choice
+        </button>
+        <button
+          className="rounded-md p-2 bg-orange-100"
+          onClick={() => setExerciseType(ExerciseType.Input)}
+        >
+          Input
+        </button>
+        <button
+          className="rounded-md p-2 bg-orange-100"
+          onClick={() => setExerciseType(ExerciseType.FillInTheBlanks)}
+        >
+          Fill in the Blanks
+        </button>
+        <button
+          className="rounded-md p-2 bg-orange-100"
+          onClick={() => setExerciseType(ExerciseType.DragAndDrop)}
+        >
+          Drag and Drop
+        </button>
+      </div>
+    )
+  }
 }
 
 interface VideoPlayerProps extends InteractiveVideoProps {

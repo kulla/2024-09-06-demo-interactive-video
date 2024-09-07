@@ -11,6 +11,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: { organge: colors.orange, gray: colors.gray },
+      spacing: { side: '16px' },
     },
   },
   plugins: [],
