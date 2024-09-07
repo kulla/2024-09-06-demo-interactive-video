@@ -93,6 +93,7 @@ function InteractiveVideoEditor({
   setMarker,
 }: InteractiveVideoEditorProps) {
   const [openModal, setOpenModal] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
   const currentTime = useRef(0)
 
   const onProgress = useCallback((event: Event) => {
@@ -103,7 +104,13 @@ function InteractiveVideoEditor({
 
   return (
     <>
-      <VideoPlayer url={url} marker={marker} onProgress={onProgress} />
+      <VideoPlayer
+        url={url}
+        marker={marker}
+        onProgress={onProgress}
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+      />
       <CreateExerciseDialog
         isOpen={openModal}
         setIsOpen={setOpenModal}
@@ -120,7 +127,10 @@ function InteractiveVideoEditor({
       />
       <button
         className="mx-auto mt-4 rounded p-2 bg-orange-100 block border-1 border-gray-500"
-        onClick={() => setOpenModal(true)}
+        onClick={() => {
+          setOpenModal(true)
+          setIsPlaying(false)
+        }}
       >
         <FontAwesomeIcon icon={faPlus} /> Aufgabe an aktueller Stelle hinzufügen
       </button>
@@ -142,11 +152,18 @@ function InteractiveVideoRenderer({
 
 interface VideoPlayerProps extends InteractiveVideoRendererProps {
   onProgress: (event: Event) => void
+  isPlaying: boolean
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function VideoPlayer({ url, marker, onProgress }: VideoPlayerProps) {
+function VideoPlayer({
+  url,
+  marker,
+  onProgress,
+  isPlaying,
+  setIsPlaying,
+}: VideoPlayerProps) {
   const [volume, setVolume] = useState(1)
-  const [isPlaying, setIsPlaying] = useState(false)
 
   return (
     <div className="mx-auto w-[640px]">
