@@ -5,7 +5,7 @@ import React, { useCallback, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsis, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons'
-import { SerloEditorProps } from '@serlo/editor'
+import { SerloEditor, SerloEditorProps } from '@serlo/editor'
 import VideoPlayerWithMarkers from 'react-video-player-extended'
 import { cn } from './helper/cn'
 import { ModalWithCloseButton } from './components/modal'
@@ -83,6 +83,10 @@ export default function InteractiveVideoPlugin() {
   }
 }
 
+interface InteractiveVideoEditorProps extends InteractiveVideoRendererProps {
+  setMarker: React.Dispatch<React.SetStateAction<Marker[]>>
+}
+
 function InteractiveVideoEditor({
   url,
   marker,
@@ -100,11 +104,17 @@ function InteractiveVideoEditor({
   return (
     <>
       <VideoPlayer url={url} marker={marker} onProgress={onProgress} />
-      <CreateMarkerDialog
+      <CreateExerciseDialog
         isOpen={openModal}
         setIsOpen={setOpenModal}
-        onCreate={(marker) => {
-          setMarker((prevMarker) => [...prevMarker, marker])
+        onCreate={(exercise) => {
+          const newMarker = {
+            type: ExerciseType.MultipleChoice,
+            time: currentTime.current,
+            ...exercise,
+          }
+
+          setMarker((prev) => [...prev, newMarker])
           setOpenModal(false)
         }}
       />
@@ -118,8 +128,20 @@ function InteractiveVideoEditor({
   )
 }
 
-function InteractiveVideoRenderer({ url, marker }: InteractiveVideoProps) {
+interface InteractiveVideoRendererProps {
+  url: string
+  marker: Marker[]
+}
+
+function InteractiveVideoRenderer({
+  url,
+  marker,
+}: InteractiveVideoRendererProps) {
   return 'play'
+}
+
+interface VideoPlayerProps extends InteractiveVideoRendererProps {
+  onProgress: (event: Event) => void
 }
 
 function VideoPlayer({ url, marker, onProgress }: VideoPlayerProps) {
@@ -141,89 +163,149 @@ function VideoPlayer({ url, marker, onProgress }: VideoPlayerProps) {
   )
 }
 
-interface CreateMarkerDialogProps {
+interface CreateExerciseDialogProps {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  onCreate: (marker: Marker) => void
+  onCreate: (exercise: Exercise) => void
 }
 
-function CreateMarkerDialog({
+function CreateExerciseDialog({
   setIsOpen,
   onCreate,
   isOpen,
-}: CreateMarkerDialogProps) {
-  const [exerciseType, setExerciseType] = useState<ExerciseType | null>(null)
+}: CreateExerciseDialogProps) {
+  const [title, setTitle] = useState('Aufgabe')
+  const [content, setContent] = useState<Content | null>(null)
 
   return (
     <ModalWithCloseButton
       isOpen={isOpen}
       title={
-        exerciseType
+        content
           ? 'Aufgabe für aktuelle Stelle erstellen'
           : 'Aufgabentyp für aktuelle Stelle auswählen'
       }
       setIsOpen={setIsOpen}
     >
-      <ExerciseTypeSelection />
+      {content === null ? (
+        <ExerciseTypeSelection />
+      ) : (
+        <ExerciseEditor content={content} />
+      )}
     </ModalWithCloseButton>
   )
 
   function ExerciseTypeSelection() {
-    if (exerciseType !== null) return
-
-    // TODO: Icon hinzufügen
     return (
       <div className="flex flex-col space-y-2">
-        <button
-          className="rounded-md p-2 bg-orange-100"
-          onClick={() => setExerciseType(ExerciseType.MultipleChoice)}
-        >
-          Multiple Choice
-        </button>
-        <button
-          className="rounded-md p-2 bg-orange-100"
-          onClick={() => setExerciseType(ExerciseType.SingleChoice)}
-        >
-          Single Choice
-        </button>
-        <button
-          className="rounded-md p-2 bg-orange-100"
-          onClick={() => setExerciseType(ExerciseType.Input)}
-        >
-          Input
-        </button>
-        <button
-          className="rounded-md p-2 bg-orange-100"
-          onClick={() => setExerciseType(ExerciseType.FillInTheBlanks)}
-        >
-          Fill in the Blanks
-        </button>
-        <button
-          className="rounded-md p-2 bg-orange-100"
-          onClick={() => setExerciseType(ExerciseType.DragAndDrop)}
-        >
-          Drag and Drop
-        </button>
+        {Object.values(ExerciseType).map((type) => (
+          <button
+            key={type}
+            className="rounded-md p-2 bg-orange-100"
+            onClick={() => setContent(getInitialContent(type))}
+          >
+            {type}
+          </button>
+        ))}
       </div>
+    )
+  }
+
+  function ExerciseEditor({ content }: { content: Content }) {
+    return (
+      <>
+        <input
+          className="w-full p-2 rounded-md border border-gray-500 mb-2"
+          type="text"
+          value={title}
+          placeholder="Titel"
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <SerloEditor
+          initialState={content}
+          editorVariant="unknown"
+          onChange={({ changed, getDocument }) => {
+            if (changed) {
+              const newState = getDocument()
+
+              if (newState !== null) {
+                setContent(newState)
+              }
+            }
+          }}
+        >
+          {(editor) => {
+            return <>{editor.element}</>
+          }}
+        </SerloEditor>
+      </>
     )
   }
 }
 
-interface VideoPlayerProps extends InteractiveVideoProps {
-  onProgress: (event: Event) => void
-}
-
-interface InteractiveVideoEditorProps extends InteractiveVideoProps {
-  setMarker: React.Dispatch<React.SetStateAction<Marker[]>>
-}
-
-interface InteractiveVideoProps {
-  url: string
-  marker: Marker[]
+function getInitialContent(type: ExerciseType): Content {
+  return {
+    plugin: 'exercise',
+    state: {
+      content: {
+        plugin: 'rows',
+        state: [
+          {
+            plugin: 'text',
+            state: [
+              {
+                type: 'p',
+                children: [
+                  { text: 'Aufgabenstellung:', bold: true },
+                  { text: ': ' },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      interactive: {
+        plugin: 'scMcExercise',
+        state: {
+          isSingleChoice: false,
+          answers: [
+            {
+              content: {
+                plugin: 'text',
+                state: [{ type: 'p', children: [{ text: 'Antwort 1' }] }],
+              },
+              isCorrect: false,
+              feedback: {
+                plugin: 'text',
+                state: [{ type: 'p', children: [{ text: '' }] }],
+              },
+            },
+            {
+              content: {
+                plugin: 'text',
+                state: [{ type: 'p', children: [{ text: 'Antwort 2' }] }],
+              },
+              isCorrect: false,
+              feedback: {
+                plugin: 'text',
+                state: [{ type: 'p', children: [{ text: '' }] }],
+              },
+            },
+          ],
+        },
+      },
+    },
+  }
 }
 
 interface Marker {
+  type: ExerciseType
   time: number
-  title: string
-  content: SerloEditorProps['initialState']
 }
+
+interface Exercise {
+  title: string
+  content: Content
+}
+
+type Content = { plugin: string; state: unknown }
