@@ -227,6 +227,9 @@ function VideoPlayer({
 
   return (
     <div className="mx-auto w-[640px]">
+      {/* Unfortunately the player does not render newly added or
+          changed markers. By adding the key attribute the video
+          player is rerendered whenever the markers change. */}
       <VideoPlayerWithMarkers
         timeStart={currentTime}
         url={url}
