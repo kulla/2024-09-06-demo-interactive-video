@@ -120,6 +120,8 @@ function InteractiveVideoEditor({
         setIsPlaying={setIsPlaying}
         currentTime={currentTime.current}
       />
+      {/* By adding "key={markers.length}" the CreateExerciseDialog is
+          reset whenever the markers change. */}
       <CreateExerciseDialog
         isOpen={openModal}
         setIsOpen={setOpenModal}
@@ -135,6 +137,7 @@ function InteractiveVideoEditor({
           setOpenModal(false)
           setIsPlaying(wasPlayingBeforeModal)
         }}
+        key={markers.length}
       />
       {editIndex !== null ? (
         <CreateExerciseDialog
