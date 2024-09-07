@@ -218,6 +218,7 @@ function CreateExerciseDialog({
       ) : (
         <ExerciseEditor content={content} />
       )}
+      <SaveAndCloseToolbar />
     </ModalWithCloseButton>
   )
 
@@ -258,6 +259,19 @@ function CreateExerciseDialog({
           }}
         </SerloEditor>
       </>
+    )
+  }
+
+  function SaveAndCloseToolbar() {
+    return (
+      <Toolbar.Root className="flex justify-end mt-6">
+        <Toolbar.Button
+          className="rounded-md p-2 bg-orange-100"
+          onClick={() => setIsOpen(false)}
+        >
+          Abbrechen
+        </Toolbar.Button>
+      </Toolbar.Root>
     )
   }
 }
