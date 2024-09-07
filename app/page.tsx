@@ -117,6 +117,7 @@ function InteractiveVideoEditor({
         onProgress={onProgress}
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
+        currentTime={currentTime.current}
       />
       <CreateExerciseDialog
         isOpen={openModal}
@@ -211,6 +212,7 @@ interface VideoPlayerProps extends InteractiveVideoRendererProps {
   onProgress: (event: Event) => void
   isPlaying: boolean
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>
+  currentTime: number
 }
 
 function VideoPlayer({
@@ -219,12 +221,14 @@ function VideoPlayer({
   onProgress,
   isPlaying,
   setIsPlaying,
+  currentTime,
 }: VideoPlayerProps) {
   const [volume, setVolume] = useState(1)
 
   return (
     <div className="mx-auto w-[640px]">
       <VideoPlayerWithMarkers
+        timeStart={currentTime}
         url={url}
         volume={volume}
         isPlaying={isPlaying}
@@ -232,6 +236,8 @@ function VideoPlayer({
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onProgress={onProgress}
+        markers={markers.map((marker, id) => ({ id, ...marker }))}
+        key={markers.length}
       />
     </div>
   )
