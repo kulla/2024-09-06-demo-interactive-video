@@ -26,7 +26,7 @@ enum ExerciseType {
 
 export default function InteractiveVideoPlugin() {
   const [mode, setMode] = useState<'play' | 'edit'>('edit')
-  const [marker, setMarker] = useState<Marker[]>([])
+  const [markers, setMarkers] = useState<Marker[]>([])
 
   const toggleMode = () => {
     setMode((prevMode) => (prevMode === 'play' ? 'edit' : 'play'))
@@ -40,11 +40,11 @@ export default function InteractiveVideoPlugin() {
           {mode === 'edit' ? (
             <InteractiveVideoEditor
               url={defaultUrl}
-              marker={marker}
-              setMarker={setMarker}
+              markers={markers}
+              setMarkers={setMarkers}
             />
           ) : (
-            <InteractiveVideoRenderer url={defaultUrl} marker={marker} />
+            <InteractiveVideoRenderer url={defaultUrl} markers={markers} />
           )}
         </div>
       </div>
@@ -85,13 +85,13 @@ export default function InteractiveVideoPlugin() {
 }
 
 interface InteractiveVideoEditorProps extends InteractiveVideoRendererProps {
-  setMarker: React.Dispatch<React.SetStateAction<Marker[]>>
+  setMarkers: React.Dispatch<React.SetStateAction<Marker[]>>
 }
 
 function InteractiveVideoEditor({
   url,
-  marker,
-  setMarker,
+  markers,
+  setMarkers,
 }: InteractiveVideoEditorProps) {
   const [openModal, setOpenModal] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -107,7 +107,7 @@ function InteractiveVideoEditor({
     <>
       <VideoPlayer
         url={url}
-        marker={marker}
+        markers={markers}
         onProgress={onProgress}
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
@@ -122,7 +122,7 @@ function InteractiveVideoEditor({
             ...exercise,
           }
 
-          setMarker((prev) => R.sortBy((x) => x.time, [...prev, newMarker]))
+          setMarkers((prev) => R.sortBy((x) => x.time, [...prev, newMarker]))
           setOpenModal(false)
         }}
       />
@@ -141,12 +141,12 @@ function InteractiveVideoEditor({
 
 interface InteractiveVideoRendererProps {
   url: string
-  marker: Marker[]
+  markers: Marker[]
 }
 
 function InteractiveVideoRenderer({
   url,
-  marker,
+  markers,
 }: InteractiveVideoRendererProps) {
   return 'play'
 }
@@ -159,7 +159,7 @@ interface VideoPlayerProps extends InteractiveVideoRendererProps {
 
 function VideoPlayer({
   url,
-  marker,
+  markers,
   onProgress,
   isPlaying,
   setIsPlaying,
@@ -339,7 +339,7 @@ function getInitialContent(type: ExerciseType): Content {
   }
 }
 
-interface Marker {
+interface Marker extends Exercise {
   type: ExerciseType
   time: number
 }
