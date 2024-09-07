@@ -1,5 +1,6 @@
 'use client'
 
+import * as R from 'ramda'
 import * as Toolbar from '@radix-ui/react-toolbar'
 import React, { useCallback, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -121,7 +122,7 @@ function InteractiveVideoEditor({
             ...exercise,
           }
 
-          setMarker((prev) => [...prev, newMarker])
+          setMarker((prev) => R.sortBy((x) => x.time, [...prev, newMarker]))
           setOpenModal(false)
         }}
       />
