@@ -275,8 +275,8 @@ function getInitialContent(type: ExerciseType): Content {
               {
                 type: 'p',
                 children: [
-                  { text: 'Aufgabenstellung:', bold: true },
-                  { text: ': ' },
+                  { text: 'Aufgabenstellung:', strong: true },
+                  { text: ' ' },
                 ],
               },
             ],
