@@ -305,7 +305,6 @@ function CreateExerciseDialog({
       ) : (
         <SerloEditor
           initialState={content}
-          editorVariant="unknown"
           onChange={({ changed, getDocument }) => {
             if (changed) {
               const newContent = getDocument()
