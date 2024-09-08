@@ -382,17 +382,26 @@ function getInitialContent(type: ExerciseType): Content {
           },
         ],
       },
-      interactive: {
+      interactive: getInteractiveContent(type),
+    },
+  }
+}
+
+function getInteractiveContent(type: ExerciseType): unknown {
+  switch (type) {
+    case ExerciseType.MultipleChoice:
+    case ExerciseType.SingleChoice:
+      return {
         plugin: 'scMcExercise',
         state: {
-          isSingleChoice: false,
+          isSingleChoice: type === ExerciseType.SingleChoice,
           answers: [
             {
               content: {
                 plugin: 'text',
                 state: [{ type: 'p', children: [{ text: 'Antwort 1' }] }],
               },
-              isCorrect: false,
+              isCorrect: true,
               feedback: {
                 plugin: 'text',
                 state: [{ type: 'p', children: [{ text: '' }] }],
@@ -411,8 +420,28 @@ function getInitialContent(type: ExerciseType): Content {
             },
           ],
         },
-      },
-    },
+      }
+    case ExerciseType.Input:
+      return {
+        plugin: 'inputExercise',
+        state: {
+          type: 'input-string-normalized-match-challenge',
+          unit: '',
+          answers: [
+            { value: '', isCorrect: true, feedback: { plugin: 'text' } },
+          ],
+        },
+      }
+    case ExerciseType.DragAndDrop:
+    case ExerciseType.FillInTheBlanks:
+      return {
+        plugin: 'blanksExercise',
+        state: {
+          text: { plugin: 'text' },
+          mode:
+            type === ExerciseType.FillInTheBlanks ? 'typing' : 'drag-and-drop',
+        },
+      }
   }
 }
 
