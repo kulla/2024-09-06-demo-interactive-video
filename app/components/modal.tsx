@@ -44,6 +44,7 @@ export function ModalWithCloseButton({
               'bg-white rounded-xl shadow-lg p-6 flex flex-col',
             )}
             onEscapeKeyDown={() => setIsOpen(false)}
+            aria-describedby={undefined}
           >
             <Dialog.Title
               className={cn(
