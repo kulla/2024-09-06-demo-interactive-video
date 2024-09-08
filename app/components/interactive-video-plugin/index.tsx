@@ -13,7 +13,7 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons'
 import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons'
-import { SerloEditor } from '@serlo/editor'
+import { SerloEditor, SerloRenderer } from '@serlo/editor'
 import { cn } from '../../helper/cn'
 import { ModalWithCloseButton } from '../modal'
 
@@ -223,14 +223,74 @@ function InteractiveVideoRenderer({
   url,
   markers,
 }: InteractiveVideoRendererProps) {
-  return 'play'
+  const lastTime = useRef(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentMarker, setCurrentMarker] = useState<Marker | null>(null)
+
+  const onProgress = useCallback(
+    (event: Event) => {
+      console.log(event, isPlaying)
+      if (event.type === 'timeupdate') {
+        const currentTime = (event.target as HTMLVideoElement).currentTime
+
+        // FIXXME: The variable `isPlaying` is not updated correctly.
+        // Thus we need to check if the video is playing by checking
+        // if the currentTime is increasing only a little bit.
+        const diff = currentTime - lastTime.current
+        if (diff >= 0 && diff < 0.5) {
+          const currentMarker = markers.find(
+            (marker) =>
+              marker.time >= lastTime.current && marker.time < currentTime,
+          )
+
+          if (currentMarker) {
+            setCurrentMarker(currentMarker)
+          }
+        }
+
+        lastTime.current = currentTime
+      }
+    },
+    [isPlaying, markers],
+  )
+
+  return (
+    <>
+      {currentMarker !== null ? (
+        <ModalWithCloseButton
+          isOpen={currentMarker !== null}
+          title={currentMarker.title}
+          setIsOpen={(value) => {
+            if (!value) setCurrentMarker(null)
+          }}
+        >
+          <SerloRenderer document={currentMarker.content} />
+          <Toolbar.Root className="flex justify-end mt-6">
+            <Toolbar.Button
+              className="button"
+              onClick={() => setCurrentMarker(null)}
+            >
+              Weiter
+            </Toolbar.Button>
+          </Toolbar.Root>
+        </ModalWithCloseButton>
+      ) : null}
+      <VideoPlayer
+        url={url}
+        markers={markers}
+        onProgress={onProgress}
+        isPlaying={currentMarker === null ? isPlaying : false}
+        setIsPlaying={setIsPlaying}
+      />
+    </>
+  )
 }
 
 interface VideoPlayerProps extends InteractiveVideoRendererProps {
   onProgress: (event: Event) => void
   isPlaying: boolean
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>
-  currentTime: number
+  currentTime?: number
 }
 
 function VideoPlayer({
