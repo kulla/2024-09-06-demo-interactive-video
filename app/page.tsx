@@ -183,7 +183,11 @@ function InteractiveVideoEditor({
           <div key={index} className="flex items-center justify-between mt-2">
             <div className="flex space-x-4 items-center">
               <span>{formatTime(marker.time)}</span>
-              {getExerciseIcon(marker.type, 80)}
+              <ExerciseIcon
+                type={marker.type}
+                width={60}
+                className="text-gray-500 bg-gray-200 rounded-md"
+              />
               <span>{marker.title}</span>
             </div>
             <div className="flex space-x-4 items-center">
@@ -297,6 +301,7 @@ function CreateExerciseDialog({
       ) : (
         <SerloEditor
           initialState={content}
+          editorVariant="unknown"
           onChange={({ changed, getDocument }) => {
             if (changed) {
               const newContent = getDocument()
@@ -419,22 +424,30 @@ interface Exercise {
 
 type Content = { plugin: string; state: unknown }
 
-function getExerciseIcon(type: ExerciseType, width = 100) {
-  return <Image src={getExeciseSvg(type)} alt={type} width={width} />
-}
+function ExerciseIcon({
+  type,
+  width = 100,
+  className,
+}: {
+  type: ExerciseType
+  width?: number
+  className?: string
+}) {
+  const Component = (() => {
+    switch (type) {
+      case ExerciseType.MultipleChoice:
+      case ExerciseType.SingleChoice:
+        return IconMultipleChoice
+      case ExerciseType.Input:
+        return IconInputExercise
+      case ExerciseType.FillInTheBlanks:
+        return IconBlanksTyping
+      case ExerciseType.DragAndDrop:
+        return IconBlanksDnd
+    }
+  })()
 
-function getExeciseSvg(type: ExerciseType) {
-  switch (type) {
-    case ExerciseType.MultipleChoice:
-    case ExerciseType.SingleChoice:
-      return IconMultipleChoice
-    case ExerciseType.Input:
-      return IconInputExercise
-    case ExerciseType.FillInTheBlanks:
-      return IconBlanksTyping
-    case ExerciseType.DragAndDrop:
-      return IconBlanksDnd
-  }
+  return <Component className={className} width={width} />
 }
 
 function getDefaultTitle(title: string, time: number): string {

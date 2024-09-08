@@ -26,6 +26,7 @@
     "react-video-player-extended": "^9.2.1"
   },
   "devDependencies": {
+    "@svgr/webpack": "^8.1.0",
     "@types/node": "^20.16.5",
     "@types/ramda": "^0",
     "@types/react": "^18.3.5",
