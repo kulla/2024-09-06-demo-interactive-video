@@ -16,7 +16,7 @@ __metadata:
     "@radix-ui/react-dialog": "npm:^1.1.1"
     "@radix-ui/react-toolbar": "npm:^1.1.0"
     "@radix-ui/themes": "npm:^3.1.3"
-    "@serlo/editor": "npm:^0.12.1"
+    "@serlo/editor": "npm:^0.10.0"
     "@svgr/webpack": "npm:^8.1.0"
     "@types/node": "npm:^20.16.5"
     "@types/ramda": "npm:^0"
@@ -26,6 +26,8 @@ __metadata:
     clsx: "npm:^2.1.1"
     eslint: "npm:^8.57.0"
     eslint-config-next: "npm:14.2.8"
+    fp-ts: "npm:^2.16.9"
+    io-ts: "npm:^2.2.21"
     next: "npm:14.2.8"
     postcss: "npm:^8.4.45"
     postcss-import: "npm:^16.1.0"
@@ -3010,15 +3012,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@serlo/editor@npm:^0.12.1":
-  version: 0.12.1
-  resolution: "@serlo/editor@npm:0.12.1"
+"@serlo/editor@npm:^0.10.0":
+  version: 0.10.0
+  resolution: "@serlo/editor@npm:0.10.0"
   dependencies:
     "@serlo/katex-styles": "npm:1.0.1"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-resizable: "npm:^3.0.5"
-  checksum: 10c0/9ca46cb9d9f626a982f64f19c5dfa3add39ed62241891548817554ad9b8482cb718efef594b761ccf038c322636ad30c859c4c217cd0a2f5eefec842f8999022
+  checksum: 10c0/34bfd91004bf8eb33a47533284ab75379a3bbca04de404c5082c3730344652c225083bad3bdf7254d79607f364f82890f49d2608a719ee15acd02581077ad3cf
   languageName: node
   linkType: hard
 
@@ -5010,6 +5012,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fp-ts@npm:^2.16.9":
+  version: 2.16.9
+  resolution: "fp-ts@npm:2.16.9"
+  checksum: 10c0/704fcc2e792bd17cb653e7b62b5d9d905c04327776df8bf2a1f67e1c6823b06c7c36036345279ac04f0b6b7214ad01f91f109f548e144c9f866a491392fbfbcc
+  languageName: node
+  linkType: hard
+
 "fs-minipass@npm:^2.0.0":
   version: 2.1.0
   resolution: "fs-minipass@npm:2.1.0"
@@ -5423,6 +5432,15 @@ __metadata:
   dependencies:
     loose-envify: "npm:^1.0.0"
   checksum: 10c0/5af133a917c0bcf65e84e7f23e779e7abc1cd49cb7fdc62d00d1de74b0d8c1b5ee74ac7766099fb3be1b05b26dfc67bab76a17030d2fe7ea2eef867434362dfc
+  languageName: node
+  linkType: hard
+
+"io-ts@npm:^2.2.21":
+  version: 2.2.21
+  resolution: "io-ts@npm:2.2.21"
+  peerDependencies:
+    fp-ts: ^2.5.0
+  checksum: 10c0/4e59e2135c26ced17f9c357c554486e716ac4c75d9bf69164702f66d41400e165786b0d653263bcd2afb4dee947bff4eb7869899ec810050ef067307764f6c32
   languageName: node
   linkType: hard
 

@@ -1,5 +1,6 @@
 'use client'
 
+import * as t from 'io-ts'
 import * as R from 'ramda'
 import * as Toolbar from '@radix-ui/react-toolbar'
 import React, { useCallback, useRef, useState } from 'react'
@@ -132,7 +133,7 @@ function InteractiveVideoEditor({
         setIsOpen={setOpenModal}
         onSave={({ title, content }) => {
           const newMarker = {
-            type: ExerciseType.MultipleChoice,
+            type: getExerciseType(content),
             time: currentTime.current,
             title: getDefaultTitle(title, currentTime.current),
             content,
@@ -157,6 +158,7 @@ function InteractiveVideoEditor({
               ...prev.slice(0, editIndex),
               {
                 ...prev[editIndex],
+                type: getExerciseType(content),
                 content,
                 title: getDefaultTitle(title, currentTime.current),
               },
@@ -442,6 +444,51 @@ function getInteractiveContent(type: ExerciseType): unknown {
             type === ExerciseType.FillInTheBlanks ? 'typing' : 'drag-and-drop',
         },
       }
+  }
+}
+
+const ExerciseContent = t.type({
+  plugin: t.literal('exercise'),
+  state: t.type({
+    interactive: t.union([
+      t.type({
+        plugin: t.literal('scMcExercise'),
+        state: t.type({
+          isSingleChoice: t.boolean,
+        }),
+      }),
+      t.type({
+        plugin: t.literal('inputExercise'),
+      }),
+      t.type({
+        plugin: t.literal('blanksExercise'),
+        state: t.type({
+          mode: t.union([t.literal('typing'), t.literal('drag-and-drop')]),
+        }),
+      }),
+    ]),
+  }),
+})
+
+function getExerciseType(content: unknown): ExerciseType {
+  if (!ExerciseContent.is(content)) {
+    throw new Error('Invalid exercise content')
+  }
+
+  const interactive = content.state.interactive
+
+  if (interactive.plugin === 'scMcExercise') {
+    return interactive.state.isSingleChoice
+      ? ExerciseType.SingleChoice
+      : ExerciseType.MultipleChoice
+  } else if (interactive.plugin === 'inputExercise') {
+    return ExerciseType.Input
+  } else if (interactive.plugin === 'blanksExercise') {
+    return interactive.state.mode === 'typing'
+      ? ExerciseType.FillInTheBlanks
+      : ExerciseType.DragAndDrop
+  } else {
+    throw new Error('Unknown interactive plugin')
   }
 }
 
