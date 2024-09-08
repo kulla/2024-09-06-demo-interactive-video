@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import * as R from 'ramda'
 import * as Toolbar from '@radix-ui/react-toolbar'
 import React, { useCallback, useRef, useState } from 'react'
@@ -15,6 +16,11 @@ import { SerloEditor } from '@serlo/editor'
 import VideoPlayerWithMarkers from 'react-video-player-extended'
 import { cn } from './helper/cn'
 import { ModalWithCloseButton } from './components/modal'
+
+import IconMultipleChoice from './icons/icon-auswahlaufgaben.svg'
+import IconInputExercise from './icons/icon-input-exercise.svg'
+import IconBlanksDnd from './icons/icon-blanks-dnd.svg'
+import IconBlanksTyping from './icons/icon-blanks-typing.svg'
 
 // A CC-BY 3.0 video from Blender Foundation
 // See https://mango.blender.org/
@@ -175,12 +181,12 @@ function InteractiveVideoEditor({
       <div className="mt-4 mx-4">
         {markers.map((marker, index) => (
           <div key={index} className="flex items-center justify-between mt-2">
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 items-center">
               <span>{formatTime(marker.time)}</span>
-              <span>{marker.type}</span>
+              {getExerciseIcon(marker.type, 80)}
               <span>{marker.title}</span>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 items-center">
               <button className="button" onClick={() => setEditIndex(index)}>
                 <FontAwesomeIcon icon={faEdit} /> Bearbeiten
               </button>
@@ -291,7 +297,6 @@ function CreateExerciseDialog({
       ) : (
         <SerloEditor
           initialState={content}
-          editorVariant="unknown"
           onChange={({ changed, getDocument }) => {
             if (changed) {
               const newContent = getDocument()
@@ -413,6 +418,24 @@ interface Exercise {
 }
 
 type Content = { plugin: string; state: unknown }
+
+function getExerciseIcon(type: ExerciseType, width = 100) {
+  return <Image src={getExeciseSvg(type)} alt={type} width={width} />
+}
+
+function getExeciseSvg(type: ExerciseType) {
+  switch (type) {
+    case ExerciseType.MultipleChoice:
+    case ExerciseType.SingleChoice:
+      return IconMultipleChoice
+    case ExerciseType.Input:
+      return IconInputExercise
+    case ExerciseType.FillInTheBlanks:
+      return IconBlanksTyping
+    case ExerciseType.DragAndDrop:
+      return IconBlanksDnd
+  }
+}
 
 function getDefaultTitle(title: string, time: number): string {
   return title.trim() !== ''
