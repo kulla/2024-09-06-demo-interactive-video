@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import * as R from 'ramda'
 import * as Toolbar from '@radix-ui/react-toolbar'
 import React, { useCallback, useRef, useState } from 'react'
@@ -321,14 +320,19 @@ function CreateExerciseDialog({
 
   function ExerciseTypeSelection() {
     return (
-      <div className="flex flex-col space-y-2">
+      <div className="grid gap-x-1 gap-y-4 grid-cols-3">
         {Object.values(ExerciseType).map((type) => (
           <button
             key={type}
-            className="button"
+            className="w-32 flex flex-col items-center space-y-2"
             onClick={() => setContent(getInitialContent(type))}
           >
-            {type}
+            <ExerciseIcon
+              type={type}
+              width={150}
+              className="button text-orange-300 hover:text-orange-400"
+            />
+            <span className="text-gray-900">{getExerciseTypeName(type)}</span>
           </button>
         ))}
       </div>
@@ -448,6 +452,21 @@ function ExerciseIcon({
   })()
 
   return <Component className={className} width={width} />
+}
+
+function getExerciseTypeName(type: ExerciseType): string {
+  switch (type) {
+    case ExerciseType.MultipleChoice:
+      return 'Multiple Choice'
+    case ExerciseType.SingleChoice:
+      return 'Single Choice'
+    case ExerciseType.Input:
+      return 'Aufgabe mit Eingabefeld'
+    case ExerciseType.FillInTheBlanks:
+      return 'Lückentext-Aufgabe'
+    case ExerciseType.DragAndDrop:
+      return 'Drag & Drop Aufgabe'
+  }
 }
 
 function getDefaultTitle(title: string, time: number): string {
