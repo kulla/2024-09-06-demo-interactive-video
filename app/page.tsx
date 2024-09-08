@@ -46,7 +46,7 @@ export default function InteractiveVideoPlugin() {
   return (
     <main className="p-4">
       <div className="mx-auto max-w-[800px] rounded-md outline-2 outline outline-gray-200">
-        {renderToolbar()}
+        <PluginToolbar />
         <div className="p-2">
           {mode === 'edit' ? (
             <InteractiveVideoEditor
@@ -62,7 +62,7 @@ export default function InteractiveVideoPlugin() {
     </main>
   )
 
-  function renderToolbar() {
+  function PluginToolbar() {
     return (
       <Toolbar.Root
         className={cn(
