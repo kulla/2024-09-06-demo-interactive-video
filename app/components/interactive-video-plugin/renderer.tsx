@@ -15,7 +15,6 @@ export function InteractiveVideoRenderer({
 
   const onProgress = useCallback(
     (event: Event) => {
-      console.log(event, isPlaying)
       if (event.type === 'timeupdate') {
         const currentTime = (event.target as HTMLVideoElement).currentTime
 
@@ -37,7 +36,7 @@ export function InteractiveVideoRenderer({
         lastTime.current = currentTime
       }
     },
-    [isPlaying, markers],
+    [markers],
   )
 
   return (
